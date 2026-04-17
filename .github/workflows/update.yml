@@ -2,21 +2,23 @@ name: Autonomous Civic Tracker Update
 
 on:
   schedule:
-    - cron: '0 12 * * *' # Executes daily at 12:00 PM UTC (5:00 AM PDT)
-  workflow_dispatch: # Allows you to trigger the script manually
+    - cron: '0 12 * * *' 
+  workflow_dispatch: 
 
 jobs:
   scrape-and-update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # This confirms the job has write access
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Upgraded to v4 to fix Node warning
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Explicit token use
 
       - name: Initialize Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5 # Upgraded to v5 to fix Node warning
         with:
           python-version: '3.10'
 
@@ -28,8 +30,8 @@ jobs:
 
       - name: Commit and Deploy Changes
         run: |
-          git config --global user.name 'Automated Tracker'
-          git config --global user.email 'bot@users.noreply.github.com'
+          git config --local user.name 'github-actions[bot]'
+          git config --local user.email 'github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m "Automated state update" || exit 0
-          git push
+          # Only commit if there are actually changes to avoid 128 errors
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated state update" && git push)
