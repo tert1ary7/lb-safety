@@ -56,8 +56,27 @@
     // System logic: The scraper will overwrite this array using Regex.
     // Ensure the structure remains exactly as formatted for the parser to hook it.
     const incidentData = [
-      { "date": "2026-04-13T00:00:00", "type": "Initial Stabbing Investigation placeholder" }
-    ];
+      {
+            "date": "2026-04-18T00:00:00",
+            "type": "(Retro Row) Bixby Knolls East Anaheim (Zaferia) Magnolia Industrial Group Uptown..."
+      },
+      {
+            "date": "2026-04-17T00:00:00",
+            "type": "Lbpd Blotter - April 17, 2026 4/17/2026 Officers Investigate A Stabbing."
+      },
+      {
+            "date": "2026-04-16T00:00:00",
+            "type": "Lbpd Blotter - April 16, 2026 4/16/2026 No Shootings Or Stabbings Were Reported ..."
+      },
+      {
+            "date": "2026-04-15T00:00:00",
+            "type": "Lbpd Blotter - April 15, 2026 4/15/2026 Officers Investigate An Officer-Involved..."
+      },
+      {
+            "date": "2026-04-14T00:00:00",
+            "type": "Lbpd Blotter - April 14, 2026 4/14/2026 No Shootings Or Stabbings Were Reported ..."
+      }
+];
 
     function calculateDays(targetDateStr) {
       const target = new Date(targetDateStr);
