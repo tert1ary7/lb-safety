@@ -5,35 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Civic Incident Telemetry</title>
 <style>
-  /* Muted, desaturated structural aesthetic */
-  body { background-color: #0f0f0f; color: #d4d4d4; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-  .dashboard { width: 100%; max-width: 750px; margin-top: 4vh; }
+  /* System-focused, high-contrast industrial aesthetic */
+  body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+  .dashboard { width: 100%; max-width: 800px; margin-top: 5vh; }
   
-  /* Primary Display */
-  .primary-board { border: 1px solid #333; background-color: #161616; padding: 40px; text-align: center; margin-bottom: 20px; }
-  .header { font-size: 1.5em; letter-spacing: 4px; color: #777; text-transform: uppercase; margin-bottom: 10px; }
-  .counter { font-size: 10em; color: #b71c1c; font-weight: bold; line-height: 1; margin: 10px 0; text-shadow: 0 0 10px rgba(183, 28, 28, 0.2); }
-  .current-context { font-size: 1.2em; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px; }
+  /* The "Simpsons" Split Placard */
+  .placard { display: flex; align-items: center; background-color: #e0e0e0; color: #111; border: 8px solid #222; padding: 20px 30px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+  .left-num { font-size: 11em; font-weight: 900; border-right: 6px solid #222; padding-right: 30px; margin-right: 30px; line-height: 0.8; color: #b71c1c; font-family: Impact, sans-serif; letter-spacing: -2px; }
+  .right-text { display: flex; flex-direction: column; justify-content: center; }
+  .text-row-1 { font-size: 3em; font-weight: 900; text-transform: uppercase; line-height: 1; letter-spacing: -1px; }
+  .text-row-2 { font-size: 2.1em; font-weight: 700; text-transform: uppercase; color: #444; line-height: 1; margin-top: 8px; letter-spacing: -1px;}
   
+  /* Impact Event Context */
+  .impact-event { margin: 15px 0 30px 0; font-size: 1.1em; color: #888; text-align: left; padding-left: 10px; font-family: 'Courier New', Courier, monospace; }
+  .impact-event a { color: #d4d4d4; text-decoration: none; border-bottom: 1px dotted #888; transition: color 0.2s; }
+  .impact-event a:hover { color: #fff; border-bottom: 1px solid #fff; }
+
   /* Historical Log */
-  .log-container { border: 1px solid #333; background-color: #161616; padding: 20px; }
-  .log-header { font-size: 1em; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  .log-container { border: 1px solid #333; background-color: #121212; padding: 20px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; }
+  .log-header { font-size: 0.9em; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
   table { width: 100%; border-collapse: collapse; text-align: left; }
   th { color: #555; font-size: 0.8em; text-transform: uppercase; padding: 8px 4px; border-bottom: 1px solid #333; }
-  td { padding: 12px 4px; border-bottom: 1px solid #222; font-size: 0.95em; }
-  .col-date { color: #888; width: 140px; white-space: nowrap; }
-  .col-event { color: #d0d0d0; }
-  .col-days { color: #777; text-align: right; width: 100px; }
+  td { padding: 12px 4px; border-bottom: 1px solid #1f1f1f; font-size: 0.95em; }
+  .col-date { color: #777; width: 120px; white-space: nowrap; }
+  .col-event a { color: #a0a0a0; text-decoration: none; }
+  .col-event a:hover { color: #fff; text-decoration: underline; }
+  .col-days { color: #666; text-align: right; width: 100px; }
   tr:last-child td { border-bottom: none; }
+  
+  /* Off-ramp */
+  .archive-link { display: block; text-align: right; margin-top: 15px; font-size: 0.85em; }
+  .archive-link a { color: #555; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
+  .archive-link a:hover { color: #888; }
 </style>
 </head>
 <body>
 
   <div class="dashboard">
-    <div class="primary-board">
-      <div class="header">Days Since Last Failure</div>
-      <div class="counter" id="days-counter">--</div>
-      <div class="current-context" id="primary-context">Awaiting Data...</div>
+    <div class="placard">
+      <div class="left-num" id="days-counter">--</div>
+      <div class="right-text">
+        <div class="text-row-1">Days Since Last</div>
+        <div class="text-row-2">Death, Stabbing,<br>or Traffic Fatality</div>
+      </div>
+    </div>
+    
+    <div class="impact-event" id="impact-container">
+      Reset by: <a href="#" id="primary-context-link">Awaiting Data...</a>
     </div>
 
     <div class="log-container">
@@ -42,45 +60,31 @@
         <thead>
           <tr>
             <th class="col-date">Date</th>
-            <th class="col-event">Context</th>
+            <th class="col-event">Event</th>
             <th class="col-days">T-Minus</th>
           </tr>
         </thead>
         <tbody id="log-body">
           </tbody>
       </table>
+      <div class="archive-link">
+        <a href="https://longbeach.gov/news-archive/?cid=6697" target="_blank">View Full Blotter Archive &rarr;</a>
+      </div>
     </div>
   </div>
 
   <script>
-    // System logic: The scraper will overwrite this array using Regex.
-    // Ensure the structure remains exactly as formatted for the parser to hook it.
+    // System logic: The scraper will overwrite this array.
     const incidentData = [
-      {
-            "date": "2026-04-18T00:00:00",
-            "type": "(Retro Row) Bixby Knolls East Anaheim (Zaferia) Magnolia Industrial Group Uptown..."
-      },
-      {
-            "date": "2026-04-17T00:00:00",
-            "type": "Lbpd Blotter - April 17, 2026 4/17/2026 Officers Investigate A Stabbing."
-      },
-      {
-            "date": "2026-04-16T00:00:00",
-            "type": "Lbpd Blotter - April 16, 2026 4/16/2026 No Shootings Or Stabbings Were Reported ..."
-      },
-      {
-            "date": "2026-04-15T00:00:00",
-            "type": "Lbpd Blotter - April 15, 2026 4/15/2026 Officers Investigate An Officer-Involved..."
-      },
-      {
-            "date": "2026-04-14T00:00:00",
-            "type": "Lbpd Blotter - April 14, 2026 4/14/2026 No Shootings Or Stabbings Were Reported ..."
-      }
-];
+      { "date": "2026-04-13T00:00:00", "type": "Initial investigation placeholder", "url": "https://longbeach.gov/news-archive/?cid=6697" }
+    ];
 
     function calculateDays(targetDateStr) {
       const target = new Date(targetDateStr);
       const now = new Date();
+      // Normalize to midnight to avoid fractional day rounding errors
+      target.setHours(0,0,0,0);
+      now.setHours(0,0,0,0);
       const diffTime = Math.abs(now - target);
       return Math.floor(diffTime / (1000 * 60 * 60 * 24));
     }
@@ -88,25 +92,28 @@
     function renderDashboard() {
       if (!incidentData || incidentData.length === 0) return;
 
-      // Render Primary Board (Index 0)
+      // Render Primary Placard
       const latest = incidentData[0];
       const latestDate = new Date(latest.date);
       
       document.getElementById("days-counter").innerText = calculateDays(latest.date);
-      document.getElementById("primary-context").innerText = `${latest.type} • ${latestDate.toLocaleDateString()}`;
+      
+      const primaryLink = document.getElementById("primary-context-link");
+      primaryLink.innerText = `${latestDate.toLocaleDateString()} — ${latest.type}`;
+      primaryLink.href = latest.url;
 
       // Render Historical Log
       const tbody = document.getElementById("log-body");
       tbody.innerHTML = "";
 
-      incidentData.forEach((incident, index) => {
+      incidentData.forEach((incident) => {
         const rowDate = new Date(incident.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
         const daysAgo = calculateDays(incident.date);
         
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="col-date">${rowDate}</td>
-          <td class="col-event">${incident.type}</td>
+          <td class="col-event"><a href="${incident.url}" target="_blank">${incident.type}</a></td>
           <td class="col-days">-${daysAgo} Days</td>
         `;
         tbody.appendChild(tr);
@@ -114,7 +121,7 @@
     }
 
     renderDashboard();
-    setInterval(renderDashboard, 1000 * 60 * 60); // Hourly refresh
+    setInterval(renderDashboard, 1000 * 60 * 60); 
   </script>
 </body>
 </html>
