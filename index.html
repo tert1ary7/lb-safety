@@ -3,44 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Civic Incident Tracker</title>
+<title>Civic Incident Telemetry</title>
 <style>
-  body { background-color: #1a1a1a; color: #f0f0f0; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-  .sign-container { border: 8px solid #ffca28; padding: 40px; background-color: #2c2c2c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 700px; border-radius: 4px; }
-  .header { font-size: 2.8em; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; color: #ffca28; letter-spacing: 2px; }
-  .sub-header { font-size: 1.2em; font-weight: 600; text-transform: uppercase; color: #ccc; margin-bottom: 20px;}
-  .number-display { font-size: 10em; color: #e53935; background: #111; padding: 10px 40px; border-radius: 8px; margin: 20px 0; font-weight: bold; font-family: monospace; border: 2px inset #333; line-height: 1; }
-  .footer { font-size: 1em; color: #888; margin-top: 20px;}
-  .disclaimer { font-size: 0.8em; color: #555; margin-top: 15px; }
+  /* Muted, desaturated structural aesthetic */
+  body { background-color: #0f0f0f; color: #d4d4d4; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+  .dashboard { width: 100%; max-width: 750px; margin-top: 4vh; }
+  
+  /* Primary Display */
+  .primary-board { border: 1px solid #333; background-color: #161616; padding: 40px; text-align: center; margin-bottom: 20px; }
+  .header { font-size: 1.5em; letter-spacing: 4px; color: #777; text-transform: uppercase; margin-bottom: 10px; }
+  .counter { font-size: 10em; color: #b71c1c; font-weight: bold; line-height: 1; margin: 10px 0; text-shadow: 0 0 10px rgba(183, 28, 28, 0.2); }
+  .current-context { font-size: 1.2em; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px; }
+  
+  /* Historical Log */
+  .log-container { border: 1px solid #333; background-color: #161616; padding: 20px; }
+  .log-header { font-size: 1em; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th { color: #555; font-size: 0.8em; text-transform: uppercase; padding: 8px 4px; border-bottom: 1px solid #333; }
+  td { padding: 12px 4px; border-bottom: 1px solid #222; font-size: 0.95em; }
+  .col-date { color: #888; width: 140px; white-space: nowrap; }
+  .col-event { color: #d0d0d0; }
+  .col-days { color: #777; text-align: right; width: 100px; }
+  tr:last-child td { border-bottom: none; }
 </style>
 </head>
 <body>
-  <div class="sign-container">
-    <div class="header">DAYS SINCE LAST</div>
-    <div class="sub-header">Shooting • Stabbing • Traffic Fatality</div>
-    
-    <div class="number-display" id="days-counter">0</div>
-    
-    <div class="footer" id="last-incident">Loading...</div>
-    <div class="disclaimer">Data aggregated from LBPD Public Blotter. Subject to institutional reporting biases.</div>
+
+  <div class="dashboard">
+    <div class="primary-board">
+      <div class="header">Days Since Last Failure</div>
+      <div class="counter" id="days-counter">--</div>
+      <div class="current-context" id="primary-context">Awaiting Data...</div>
+    </div>
+
+    <div class="log-container">
+      <div class="log-header">Recent Incident Telemetry</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-date">Date</th>
+            <th class="col-event">Context</th>
+            <th class="col-days">T-Minus</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    // System logic: Hardcoded to the latest LBPD blotter data (April 13, 2026 - Stabbing)
-    const lastIncidentDate = new Date("2026-04-17T00:00:00"); 
-    
-    function updateCounter() {
+    // System logic: The scraper will overwrite this array using Regex.
+    // Ensure the structure remains exactly as formatted for the parser to hook it.
+    const incidentData = [
+      { "date": "2026-04-13T00:00:00", "type": "Initial Stabbing Investigation placeholder" }
+    ];
+
+    function calculateDays(targetDateStr) {
+      const target = new Date(targetDateStr);
       const now = new Date();
-      const diffTime = Math.abs(now - lastIncidentDate);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
-      
-      document.getElementById("days-counter").innerText = diffDays;
-      document.getElementById("last-incident").innerText = 
-        `Last recorded incident: ${lastIncidentDate.toDateString()}`;
+      const diffTime = Math.abs(now - target);
+      return Math.floor(diffTime / (1000 * 60 * 60 * 24));
     }
 
-    updateCounter();
-    setInterval(updateCounter, 1000 * 60 * 60); // Refresh hourly
+    function renderDashboard() {
+      if (!incidentData || incidentData.length === 0) return;
+
+      // Render Primary Board (Index 0)
+      const latest = incidentData[0];
+      const latestDate = new Date(latest.date);
+      
+      document.getElementById("days-counter").innerText = calculateDays(latest.date);
+      document.getElementById("primary-context").innerText = `${latest.type} • ${latestDate.toLocaleDateString()}`;
+
+      // Render Historical Log
+      const tbody = document.getElementById("log-body");
+      tbody.innerHTML = "";
+
+      incidentData.forEach((incident, index) => {
+        const rowDate = new Date(incident.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        const daysAgo = calculateDays(incident.date);
+        
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="col-date">${rowDate}</td>
+          <td class="col-event">${incident.type}</td>
+          <td class="col-days">-${daysAgo} Days</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderDashboard();
+    setInterval(renderDashboard, 1000 * 60 * 60); // Hourly refresh
   </script>
 </body>
 </html>
