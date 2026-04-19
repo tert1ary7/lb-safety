@@ -113,27 +113,27 @@
       return Math.floor(diffTime / (1000 * 60 * 60 * 24));
     }
 
-    function renderDashboard() {
+function renderDashboard() {
       if (!incidentData || incidentData.length === 0) return;
 
-      // Render Primary Placard
-      const latest = incidentData[0];
-      const latestDate = new Date(latest.date);
-      
-      document.getElementById("days-counter").innerText = calculateDays(latest.date);
+      // Logic Filter: Find the first entry that ISN'T a "No Incident" status
+      const lastTrueIncident = incidentData.find(item => 
+        !item.type.includes("No Shootings") && 
+        !item.type.includes("No Critical Failures")
+      ) || incidentData[0]; // Fallback to first item if all are clear
+
+      document.getElementById("days-counter").innerText = calculateDays(lastTrueIncident.date);
       
       const primaryLink = document.getElementById("primary-context-link");
-      primaryLink.innerText = `${latestDate.toLocaleDateString()} — ${latest.type}`;
-      primaryLink.href = latest.url;
+      primaryLink.innerText = `${new Date(lastTrueIncident.date).toLocaleDateString()} — ${lastTrueIncident.type}`;
+      primaryLink.href = lastTrueIncident.url;
 
-      // Render Historical Log
+      // Render Historical Log (unchanged, shows everything)
       const tbody = document.getElementById("log-body");
       tbody.innerHTML = "";
-
       incidentData.forEach((incident) => {
         const rowDate = new Date(incident.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
         const daysAgo = calculateDays(incident.date);
-        
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="col-date">${rowDate}</td>
