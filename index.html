@@ -76,8 +76,32 @@
   <script>
     // System logic: The scraper will overwrite this array.
     const incidentData = [
-      { "date": "2026-04-13T00:00:00", "type": "Initial investigation placeholder", "url": "https://longbeach.gov/news-archive/?cid=6697" }
-    ];
+      {
+            "date": "2026-04-19T00:00:00",
+            "type": "No Shootings Or Stabbings Were Reported Overnight.",
+            "url": "https://longbeach.gov/"
+      },
+      {
+            "date": "2026-04-18T00:00:00",
+            "type": "No Shootings Or Stabbings Were Reported Overnight.",
+            "url": "https://longbeach.gov/police/news/lbpd-blotter-april-18-2026/"
+      },
+      {
+            "date": "2026-04-17T00:00:00",
+            "type": "Officers Investigate A Stabbing.",
+            "url": "https://longbeach.gov/police/news/lbpd-blotter-april-17-2026/"
+      },
+      {
+            "date": "2026-04-16T00:00:00",
+            "type": "No Shootings Or Stabbings Were Reported Overnight.",
+            "url": "https://longbeach.gov/police/news/lbpd-blotter-april-16-2026/"
+      },
+      {
+            "date": "2026-04-15T00:00:00",
+            "type": "Officers Investigate An Officer-Involved Shooting.",
+            "url": "https://longbeach.gov/police/news/lbpd-blotter-april-15-2026/"
+      }
+];
 
     function calculateDays(targetDateStr) {
       const target = new Date(targetDateStr);
